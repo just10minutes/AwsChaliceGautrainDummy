@@ -3,9 +3,9 @@ This is dummy data stored using Chalice and DynamoDB
 Requirements:
 	Python 3.6
 Installation:
-Create virtual environment specific to this project
-pip install awscli
-pip install chalice
+	Create virtual environment specific to this project
+	pip install awscli
+	pip install chalice
 
 configure authentication refer aws to get the key and secret
 setup required user on aws console with all privilage
