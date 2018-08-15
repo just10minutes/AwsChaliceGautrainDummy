@@ -2,3 +2,4 @@
 .chalice/venv/
 .aws
 __pycache__
+.%HOMEDRIVE%%HOMEPATH%/
