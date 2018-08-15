@@ -5,7 +5,9 @@
     "dev": {
       "api_gateway_stage": "api",
       "environment_variables": {
-        "CARDS_TABLE_NAME": "gautrain-7b511a5c-b817-49e5-b1da-a2816bee76a3"
+        "CARDS_TABLE_NAME": "gautrain-7b511a5c-b817-49e5-b1da-a2816bee76a3",
+        "SB_TABLE_NAME": "sb-c42245e9-fa54-4a2a-ad77-3c72ab391875",
+        "SB_TRANS_TABLE_NAME": "sb_trans-59087013-4677-49b2-954c-728022ca4d50"
       }
     }
   }

@@ -13,6 +13,19 @@ TABLES = {
         'hash_key': 'card_id',
         'range_key': None,
     },
+    'sb': {
+        'prefix': 'sb',
+        'env_var': 'SB_TABLE_NAME',
+        'hash_key': 'account_num',
+        'range_key': 'card_id',
+    },
+        'sb_trans': {
+            'prefix': 'sb_trans',
+            'env_var': 'SB_TRANS_TABLE_NAME',
+            'hash_key': 'account_num',
+            'range_key': 'uid',
+            'partition_key' : 'uid'
+        },
 }
 
 
@@ -66,7 +79,7 @@ def main():
     # app - stores the todo items
     # users - stores the user data.
     parser.add_argument('-t', '--table-type', default='app',
-                        choices=['cards',],
+                        choices=['cards','sb','sb_trans'],
                         help='Specify which type to create')
     args = parser.parse_args()
     table_config = TABLES[args.table_type]
