@@ -7,7 +7,12 @@
       "environment_variables": {
         "CARDS_TABLE_NAME": "gautrain-7b511a5c-b817-49e5-b1da-a2816bee76a3",
         "SB_TABLE_NAME": "sb-c42245e9-fa54-4a2a-ad77-3c72ab391875",
-        "SB_TRANS_TABLE_NAME": "sb_trans-59087013-4677-49b2-954c-728022ca4d50"
+        "SB_TRANS_TABLE_NAME": "sb_trans-59087013-4677-49b2-954c-728022ca4d50",
+        "GAUTRAIN_CARDS": "gautrainCards-b6668ac1-2669-41a4-b5a2-c9c26666b0a4",
+        "SB_ACCOUNT_DETAILS": "sbAcntDtls-c7046cd5-09da-408d-884c-5ab3dc464e66",
+        "SB_TRANSACTIONS": "sbTransactions-332216bb-daab-476e-b966-1995fe99bac7",
+        "SB_GAUTRAIN_CARDS_META": "sbGCMeta-54f330c9-2d68-4ea2-8d0b-4ac35e42cbd3",
+        "GAUTRAIN_STATIONS": "gautrainStations-b04d7085-c26d-4a14-ba06-08222e1aa18f"
       }
     }
   }

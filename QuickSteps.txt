@@ -1,0 +1,36 @@
+#Get List of tables and put to awstables.txt
+http https://mttg65bzj1.execute-api.us-east-2.amazonaws.com/api/test-ddb | grep "\[" | sed 's/\[//g' | sed 's/\]//g' | tr , '\n' > awstables.txt
+
+aws dynamodb delete-table --table-name  provideTableName
+
+for table in `cat awstables.txt`; do
+    aws dynamodb delete-table --table-name $table
+    echo "Table deleted - $table"
+done
+
+
+python createtable.py --table-type gautrainCards
+python createtable.py --table-type sbAcntDtls
+python createtable.py --table-type sbTrans
+python createtable.py --table-type sbGCMeta
+python createtable.py --table-type gautrainStations
+
+http https://mttg65bzj1.execute-api.us-east-2.amazonaws.com/api/gcd
+echo {"cardId" : "123456789011111", "expiryDate" : "2019-12-31" , "balance" : 100 } | http POST https://mttg65bzj1.execute-api.us-east-2.amazonaws.com/api/gcd
+echo {"cardId" : "123456789022222", "expiryDate" : "2020-12-31" , "balance" : 200 } | http POST https://mttg65bzj1.execute-api.us-east-2.amazonaws.com/api/gcd
+
+http https://mttg65bzj1.execute-api.us-east-2.amazonaws.com/api/sbad
+echo {"accountNumber" : "2018090506" , "latestBalance" : 5000 , "currentBalance" : 4900, "beneficiaryCount" : 10 , "accountKey":"2018090506" , "accountType" : "CHEQUE" } | http POST https://mttg65bzj1.execute-api.us-east-2.amazonaws.com/api/sbad
+echo {"accountNumber" : "2018090507" , "latestBalance" : 3000 , "currentBalance" : 2900, "beneficiaryCount" : 10 , "accountKey":"2018090507" , "accountType" : "CHEQUE" } | http POST https://mttg65bzj1.execute-api.us-east-2.amazonaws.com/api/sbad
+
+
+http https://mttg65bzj1.execute-api.us-east-2.amazonaws.com/api/sbt
+echo {"topupItemId" : "123456789011111", "accountNumber" : "2018090506" , "topupType" : "GAUTRAIN", "topupAmount": 20, "reference" : "OWN CARD", "lbAlert" : "Y",  "geoAlert" : "Y",  "lbLimit" : 30, "email" :"rajesh.hemmadi@standardbank.co.za" , "mobile" : "0838993991" } | http POST https://127.0.0.1:8000/sbt
+echo {"topupItemId" : "123456789011111", "accountNumber" : "2018090506" , "topupType" : "GAUTRAIN", "topupAmount": 20, "reference" : "OWN CARD", "lbAlert" : "Y",  "geoAlert" : "Y",  "lbLimit" : 30, "email" :"rajesh.hemmadi@standardbank.co.za" , "mobile" : "0838993991" } | http POST https://mttg65bzj1.execute-api.us-east-2.amazonaws.com/api/sbt
+echo {"topupItemId" : "123456789022222", "accountNumber" : "2018090506" , "topupType" : "GAUTRAIN", "topupAmount": 20 } | http POST https://mttg65bzj1.execute-api.us-east-2.amazonaws.com/api/sbt
+echo {"topupItemId" : "0838993991", "accountNumber" : "2018090506" , "topupType" : "DATA", "topupAmount": 30 } | http POST https://mttg65bzj1.execute-api.us-east-2.amazonaws.com/api/sbt
+echo {"topupItemId" : "0838993991", "accountNumber" : "2018090506" , "topupType" : "AIRTIME", "topupAmount": 40 } | http POST https://mttg65bzj1.execute-api.us-east-2.amazonaws.com/api/sbt
+
+
+http https://mttg65bzj1.execute-api.us-east-2.amazonaws.com/api/sbgcm
+echo { "cardId" : "123456789011111", "accountNumber" : "2018090506", "reference" : "OWN CARD", "lbAlert" : "Y",  "geoAlert" : "Y",  "lbLimit" : 30, "email" :"rajesh.hemmadi@standardbank.co.za" , "mobile" : "0838993991" } | http POST https://mttg65bzj1.execute-api.us-east-2.amazonaws.com/api/sbgcm

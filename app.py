@@ -2,42 +2,66 @@ from chalice import Chalice
 from chalicelib import db
 import os
 import boto3
+import json
 
-app = Chalice(app_name='gautrain')
+app = Chalice(app_name='hackathon2018')
 app.debug = True
-_DB = None
-_SB = None #Sb table stores cards meta like email mobile alert etc
-_SBT = None #Sb transaction table_exists
+_GCDTBL = None #Gautrain Table
+_SBADTBL = None #Sb Account Details
+_SBTTBL = None #Sb transaction table
+_SBGCMTBL = None #Sb Gautrain Card Meta  stores cards meta like email mobile alert etc
+_GSGLTBL = None  #Gautrain Stations Geo Location
 
 #Function for cards table
-def get_app_db():
-    global _DB
-    if _DB is None:
-        _DB = db.DynamoDBCards(
+def get_gautrain_cards_details():
+    global _GCDTBL
+    if _GCDTBL is None:
+        _GCDTBL = db.DynamoGautrainCardDetails(
             boto3.resource('dynamodb').Table(
-                os.environ['CARDS_TABLE_NAME'])
+                os.environ['GAUTRAIN_CARDS'])
         )
-    return _DB
+    return _GCDTBL
 
 #Function for SB data (metadata of cards) table
-def get_sb_db():
-    global _SB
-    if _SB is None:
-        _SB = db.DynamoDBSb(
+def get_sb_account_details():
+    global _SBADTBL
+    if _SBADTBL is None:
+        _SBADTBL = db.DynamoSBAccountDetails(
             boto3.resource('dynamodb').Table(
-                os.environ['SB_TABLE_NAME'])
+                os.environ['SB_ACCOUNT_DETAILS'])
         )
-    return _SB
+    return _SBADTBL
 
 #Function for Transaction table
-def get_sbt_db():
-    global _SBT
-    if _SBT is None:
-        _SBT = db.DynamoDBSbTrans(
+def get_sb_transactions():
+    global _SBTTBL
+    if _SBTTBL is None:
+        _SBTTBL = db.DynamoSBTransactions(
             boto3.resource('dynamodb').Table(
-                os.environ['SB_TRANS_TABLE_NAME'])
+                os.environ['SB_TRANSACTIONS'])
         )
-    return _SBT
+    return _SBTTBL
+
+#Function for sb gautrain card meta
+def get_sb_gautrain_cards_meta():
+    global _SBGCMTBL
+    if _SBGCMTBL is None:
+        _SBGCMTBL = db.DynamoSBGautrainCardsMeta(
+            boto3.resource('dynamodb').Table(
+                os.environ['SB_GAUTRAIN_CARDS_META'])
+        )
+    return _SBGCMTBL
+
+def get_sb_gautrain_stations_data():
+    global _GSGLTBL
+    if _GSGLTBL is None:
+        _GSGLTBL = db.DynamoGautrainStationDetails(
+            boto3.resource('dynamodb').Table(
+                os.environ['GAUTRAIN_STATIONS'])
+        )
+    return _GSGLTBL
+
+
 
 @app.route('/', methods=['GET'])
 def index():
@@ -46,116 +70,212 @@ def index():
 
 
 #gc stands for Gautrain cards end point
-@app.route('/gc', methods=['GET'])
+@app.route('/gcd', methods=['GET'])
 def get_cards():
-    return get_app_db().list_all_items()
+    return get_gautrain_cards_details().list_all_items()
 
 
-@app.route('/gc', methods=['POST'])
+@app.route('/gcd', methods=['POST'])
 def add_new_card():
     body = app.current_request.json_body
-    return get_app_db().add_item(
-        card_id=body['card_id'],
-        expiry_date=body['expiry_date'],
+    return get_gautrain_cards_details().add_item(
+        cardId=body['cardId'],
+        expiryDate=body['expiryDate'],
         balance=body['balance'],
     )
 
 
-@app.route('/gc/{card_id}', methods=['GET'])
-def get_card(card_id):
-    return get_app_db().get_item(card_id)
+@app.route('/gcd/{cardId}', methods=['GET'])
+def get_card(cardId):
+    return get_gautrain_cards_details().get_item(cardId)
 
 
-@app.route('/gc/{card_id}', methods=['DELETE'])
-def delete_card(card_id):
-    return get_app_db().delete_item(card_id)
+@app.route('/gcd/{cardId}', methods=['DELETE'])
+def delete_card(cardId):
+    return get_gautrain_cards_details().delete_item(cardId)
 
 
-@app.route('/gc/{card_id}', methods=['PUT'])
-def update_card(card_id):
+@app.route('/gcd/{cardId}', methods=['PUT'])
+def update_card(cardId):
     body = app.current_request.json_body
-    get_app_db().update_balance(
-        card_id=card_id,
+    get_gautrain_cards_details().update_item(
+        cardId=cardId,
+        expiryDate=body.get('expiryDate'),
         balance=body.get('balance')
         )
 
-#sb stands for standard bank details which is saved from bank side
-@app.route('/sb', methods=['GET'])
-def get_sb_cards():
-    return get_sb_db().list_items()
 
 
-@app.route('/sb', methods=['POST'])
-def add_sb_new_card():
+#sbad stand for Standarda Bank Account details
+@app.route('/sbad', methods=['GET'])
+def list_account_details():
+    return get_sb_account_details().list_all_items()
+
+@app.route('/sbad', methods=['POST'])
+def add_new_account_details():
     body = app.current_request.json_body
-    return get_sb_db().add_item(
-        card_id=body['card_id'],
-        email=body['email'],
-        mobile=body['mobile'],
-        lb_limit=body['lb_limit'],
-        lb_alert=body['lb_alert'],
-        geo_alert=body['geo_alert'],
-        alert_to=body['alert_to'],
+    return get_sb_account_details().add_item(
+        accountNumber = body['accountNumber'],
+        latestBalance = body['latestBalance'],
+        currentBalance = body['currentBalance'],
+        beneficiaryCount = body['beneficiaryCount'],
+        accountKey= body['accountKey'],
+        accountType= body['accountType']
     )
 
 
-@app.route('/sb/{card_id}', methods=['GET'])
-def get_sb_card(card_id):
-    return get_sb_db().get_item(card_id)
+@app.route('/sbad/{accountNumber}', methods=['GET'])
+def get_account_details(accountNumber):
+    return get_sb_account_details().get_item(accountNumber)
 
 
-@app.route('/sb/{card_id}', methods=['DELETE'])
-def delete_sb_card(card_id):
-    return get_sb_db().delete_item(card_id)
+@app.route('/sbad/{accountNumber}', methods=['DELETE'])
+def delete_account_details(accountNumber):
+    return get_sb_account_details().delete_item(accountNumber)
 
 
-@app.route('/sb/{card_id}', methods=['PUT'])
-def update_sb_card(card_id):
+@app.route('/sbad/{accountNumber}', methods=['PUT'])
+def update_account_details(accountNumber):
     body = app.current_request.json_body
-    get_sb_db().update_item(
-        card_id=card_id,
-        reference=body.get('reference'),
-        email=body.get('email'),
-        mobile=body.get('mobile'),
-        lb_limit=body.get('lb_limit'),
-        lb_alert=body.get('lb_alert'),
-        geo_alert=body.get('geo_alert'),
-        alert_to=body.get('alert_to'),
-        added_on=body.get('added_on')
+    get_sb_account_details().update_item(
+        accountNumber = accountNumber,
+        latestBalance = body['latestBalance'],
+        currentBalance = body['currentBalance'],
+        beneficiaryCount = body['beneficiaryCount'],
+        accountKey= body['accountKey'],
+        accountType= body['accountType']
         )
-
-@app.route('/sb/list', methods=['GET'])
-def get_sb_cards_list():
-    return get_sb_db().list_all_items()
 
 
 
 #sbt stands for SB transactions
 @app.route('/sbt', methods=['GET'])
-def get_sbt_trans():
-    return get_sbt_db().list_items()
+def get_sb_trans_list():
+    return get_sb_transactions().list_all_items()
+
+@app.route('/sbt/{accountNumber}', methods=['GET'])
+def get_sb_trans_detail(accountNumber):
+    return get_sb_transactions().list_items(accountNumber)
 
 
 @app.route('/sbt', methods=['POST'])
-def add_sbt_new_card():
+def add_sb_trans_new():
     body = app.current_request.json_body
-    return get_sbt_db().add_item(
-        card_id=body['card_id'],
-        topup=body['topup'],
+    return get_sb_transactions().add_item(
+        topupItemId = body['topupItemId'],
+        accountNumber = body['accountNumber'],
+        topupType = body['topupType'],
+        topupAmount = body['topupAmount'],
+        reference = body['reference'],
+        lbAlert = body['lbAlert'],
+        geoAlert = body['geoAlert'],
+        lbLimit = body['lbLimit'],
+        email = body['email'],
+        mobile = body['mobile']
     )
 
-@app.route('/sbt/list', methods=['GET'])
-def get_sbt_trans_list():
-    return get_sbt_db().list_all_items()
+@app.route('/sbt/delete/{uid}', methods=['DELETE'])
+def delete_sb_trans_detail(uid):
+    return get_sb_transactions().delete_item(uid)
+
+
+
+#sbgcm stands for standard bank gautrain card meta
+@app.route('/sbgcm/{accountNumber}', methods=['GET'])
+def get_sb_gc_meta_list(accountNumber):
+    return get_sb_gautrain_cards_meta().list_items(accountNumber)
+
+
+@app.route('/sbgcm', methods=['POST'])
+def add_sb_gc_meta_new():
+    body = app.current_request.json_body
+    return get_sb_gautrain_cards_meta().add_item(
+        cardId = body['cardId'],
+        accountNumber = body['accountNumber'],
+        reference = body['reference'],
+        lbAlert = body['lbAlert'],
+        geoAlert = body['geoAlert'],
+        lbLimit = body['lbLimit'],
+        email = body['email'],
+        mobile = body['mobile']
+    )
+
+
+@app.route('/sbgcm/{accountNumber}/{cardId}', methods=['GET'])
+def sb_gc_meta_acc_card(accountNumber,cardId):
+    return get_sb_gautrain_cards_meta().get_item(accountNumber,cardId)
+
+
+@app.route('/sbgcm/delete/{accountNumber}/{cardId}', methods=['DELETE'])
+def delete_sb_gc_meta_acc_card(accountNumber,cardId):
+    return get_sb_gautrain_cards_meta().delete_item(accountNumber,cardId)
+
+
+@app.route('/sbgcm/{accountNumber}/{cardId}', methods=['PUT'])
+def update_sb_gc_meta_acc_card(accountNumber,cardId):
+    body = app.current_request.json_body
+    get_sb_gautrain_cards_meta().update_item(
+        accountNumber=accountNumber,
+        cardId=cardId,
+        reference = body['reference'],
+        lbAlert = body['lbAlert'],
+        geoAlert = body['geoAlert'],
+        lbLimit = body['lbLimit'],
+        email = body['email'],
+        mobile = body['mobile']
+        )
+
+@app.route('/sbgcm', methods=['GET'])
+def get_sb_gautrain_cards_meta_list():
+    return get_sb_gautrain_cards_meta().list_all_items()
+
+geoLocations = json.dumps([
+        {"sandton":{ "latitude":"10.0","longitude":"20.0"} },
+         {"rosebank":{"latitude":"11.0","longitude":"22.0"} }
+        ])
+
+@app.route('/gsgl', methods=['GET'])
+def get_gs_geoLocation():
+    #return geoLocations
+    data = get_sb_gautrain_stations_data().list_all_items()[0]
+    return (data['stations'])
+
+@app.route('/gsgl/list', methods=['GET'])
+def get_gs_geoLocation():
+    #return geoLocations
+    data = get_sb_gautrain_stations_data().list_all_items()
+    return (data)
+
+@app.route('/gsgl', methods=['POST'])
+def add_gs_geoLocation():
+    body = app.current_request.json_body
+    return get_sb_gautrain_stations_data().add_item(
+    stations = body
+    #stations = geoLocations
+
+    )
+
+@app.route('/gsgl', methods=['DELETE'])
+def delete_gs_geoLocation():
+    return get_sb_gautrain_stations_data().delete_item()
+
+@app.route('/gsgl/update', methods=['PUT'])
+def update_gs_geoLocation():
+    body = app.current_request.json_body
+    return get_sb_gautrain_stations_data().update_item(
+            stations = body)
 
 
 @app.route('/test-ddb')
 def test_ddb():
     resource = boto3.resource('dynamodb')
-    cards = resource.Table(os.environ['CARDS_TABLE_NAME'])
-    sb = resource.Table(os.environ['SB_TABLE_NAME'])
-    sbt = resource.Table(os.environ['SB_TRANS_TABLE_NAME'])
-    return (cards.name, sb.name, sbt.name)
+    gautrainCards = resource.Table(os.environ['GAUTRAIN_CARDS'])
+    sbAcntDtls = resource.Table(os.environ['SB_ACCOUNT_DETAILS'])
+    sbTransactions = resource.Table(os.environ['SB_TRANSACTIONS'])
+    sbGCMeta = resource.Table(os.environ['SB_GAUTRAIN_CARDS_META'])
+    gautrainStations = resource.Table(os.environ['GAUTRAIN_STATIONS'])
+    return (gautrainCards.name, sbAcntDtls.name, sbTransactions.name,sbGCMeta.name,gautrainStations.name )
+
 
 
 

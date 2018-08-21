@@ -7,24 +7,35 @@ import boto3
 
 
 TABLES = {
-    'cards': {
-        'prefix': 'gautrain',
-        'env_var': 'CARDS_TABLE_NAME',
-        'hash_key': 'card_id',
+    'gautrainCards': {
+        'prefix': 'gautrainCards',
+        'env_var': 'GAUTRAIN_CARDS',
+        'hash_key': 'cardId',
         'range_key': None,
     },
-    'sb': {
-        'prefix': 'sb',
-        'env_var': 'SB_TABLE_NAME',
-        'hash_key': 'account_num',
-        'range_key': 'card_id',
+    'sbAcntDtls': {
+        'prefix': 'sbAcntDtls',
+        'env_var': 'SB_ACCOUNT_DETAILS',
+        'hash_key': 'accountNumber',
+        'range_key': None,
     },
-        'sb_trans': {
-            'prefix': 'sb_trans',
-            'env_var': 'SB_TRANS_TABLE_NAME',
-            'hash_key': 'account_num',
-            'range_key': 'uid',
-            'partition_key' : 'uid'
+    'sbTrans': {
+        'prefix': 'sbTransactions',
+        'env_var': 'SB_TRANSACTIONS',
+        'hash_key': 'uid',
+        'range_key': None
+    },
+    'sbGCMeta': {
+            'prefix': 'sbGCMeta',
+            'env_var': 'SB_GAUTRAIN_CARDS_META',
+            'hash_key': 'accountNumber',
+            'range_key': 'cardId'
+        },
+    'gautrainStations': {
+            'prefix': 'gautrainStations',
+            'env_var': 'GAUTRAIN_STATIONS',
+            'hash_key': 'id',
+            'range_key': None
         },
 }
 
@@ -38,6 +49,7 @@ def create_table(table_name_prefix, hash_key, range_key=None):
             'KeyType': 'HASH',
         }
     ]
+
     attribute_definitions = [
         {
             'AttributeName': hash_key,
@@ -79,7 +91,7 @@ def main():
     # app - stores the todo items
     # users - stores the user data.
     parser.add_argument('-t', '--table-type', default='app',
-                        choices=['cards','sb','sb_trans'],
+                        choices=['gautrainCards','sbAcntDtls','sbTrans', 'sbGCMeta', 'gautrainStations'],
                         help='Specify which type to create')
     args = parser.parse_args()
     table_config = TABLES[args.table_type]
