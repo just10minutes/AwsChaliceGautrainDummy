@@ -187,7 +187,7 @@ class DynamoSBTransactions(TableFunctions):
         )
         #run few more updates
         #cardId = topupItemId
-        if topupType.lower() == 'gautrain':
+        if topupType.lower() == 'train':
             print ('Updating Meta data')
             DynamoSBGautrainCardsMeta(boto3.resource('dynamodb').Table(
                 os.environ['SB_GAUTRAIN_CARDS_META'])).add_item(cardId, accountNumber, reference,  lbAlert, geoAlert, lbLimit, email, mobile)

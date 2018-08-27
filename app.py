@@ -70,12 +70,12 @@ def index():
 
 
 #gc stands for Gautrain cards end point
-@app.route('/gcd', methods=['GET'])
+@app.route('/gcd', methods=['GET'],cors=True)
 def get_cards():
     return get_gautrain_cards_details().list_all_items()
 
 
-@app.route('/gcd', methods=['POST'])
+@app.route('/gcd', methods=['POST'],cors=True)
 def add_new_card():
     body = app.current_request.json_body
     return get_gautrain_cards_details().add_item(
@@ -85,17 +85,17 @@ def add_new_card():
     )
 
 
-@app.route('/gcd/{cardId}', methods=['GET'])
+@app.route('/gcd/{cardId}', methods=['GET'],cors=True)
 def get_card(cardId):
     return get_gautrain_cards_details().get_item(cardId)
 
 
-@app.route('/gcd/{cardId}', methods=['DELETE'])
+@app.route('/gcd/{cardId}', methods=['DELETE'],cors=True)
 def delete_card(cardId):
     return get_gautrain_cards_details().delete_item(cardId)
 
 
-@app.route('/gcd/{cardId}', methods=['PUT'])
+@app.route('/gcd/{cardId}', methods=['PUT'],cors=True)
 def update_card(cardId):
     body = app.current_request.json_body
     get_gautrain_cards_details().update_item(
@@ -107,11 +107,11 @@ def update_card(cardId):
 
 
 #sbad stand for Standarda Bank Account details
-@app.route('/sbad', methods=['GET'])
+@app.route('/sbad', methods=['GET'],cors=True)
 def list_account_details():
     return get_sb_account_details().list_all_items()
 
-@app.route('/sbad', methods=['POST'])
+@app.route('/sbad', methods=['POST'],cors=True)
 def add_new_account_details():
     body = app.current_request.json_body
     return get_sb_account_details().add_item(
@@ -124,17 +124,17 @@ def add_new_account_details():
     )
 
 
-@app.route('/sbad/{accountNumber}', methods=['GET'])
+@app.route('/sbad/{accountNumber}', methods=['GET'],cors=True)
 def get_account_details(accountNumber):
     return get_sb_account_details().get_item(accountNumber)
 
 
-@app.route('/sbad/{accountNumber}', methods=['DELETE'])
+@app.route('/sbad/{accountNumber}', methods=['DELETE'],cors=True)
 def delete_account_details(accountNumber):
     return get_sb_account_details().delete_item(accountNumber)
 
 
-@app.route('/sbad/{accountNumber}', methods=['PUT'])
+@app.route('/sbad/{accountNumber}', methods=['PUT'],cors=True)
 def update_account_details(accountNumber):
     body = app.current_request.json_body
     get_sb_account_details().update_item(
@@ -149,16 +149,16 @@ def update_account_details(accountNumber):
 
 
 #sbt stands for SB transactions
-@app.route('/sbt', methods=['GET'])
+@app.route('/sbt', methods=['GET'],cors=True)
 def get_sb_trans_list():
     return get_sb_transactions().list_all_items()
 
-@app.route('/sbt/{accountNumber}', methods=['GET'])
+@app.route('/sbt/{accountNumber}', methods=['GET'],cors=True)
 def get_sb_trans_detail(accountNumber):
     return get_sb_transactions().list_items(accountNumber)
 
 
-@app.route('/sbt', methods=['POST'])
+@app.route('/sbt', methods=['POST'],cors=True)
 def add_sb_trans_new():
     body = app.current_request.json_body
     return get_sb_transactions().add_item(
@@ -174,19 +174,19 @@ def add_sb_trans_new():
         mobile = body['mobile']
     )
 
-@app.route('/sbt/delete/{uid}', methods=['DELETE'])
+@app.route('/sbt/delete/{uid}', methods=['DELETE'],cors=True)
 def delete_sb_trans_detail(uid):
     return get_sb_transactions().delete_item(uid)
 
 
 
 #sbgcm stands for standard bank gautrain card meta
-@app.route('/sbgcm/{accountNumber}', methods=['GET'])
+@app.route('/sbgcm/{accountNumber}', methods=['GET'],cors=True)
 def get_sb_gc_meta_list(accountNumber):
     return get_sb_gautrain_cards_meta().list_items(accountNumber)
 
 
-@app.route('/sbgcm', methods=['POST'])
+@app.route('/sbgcm', methods=['POST'],cors=True)
 def add_sb_gc_meta_new():
     body = app.current_request.json_body
     return get_sb_gautrain_cards_meta().add_item(
@@ -201,17 +201,17 @@ def add_sb_gc_meta_new():
     )
 
 
-@app.route('/sbgcm/{accountNumber}/{cardId}', methods=['GET'])
+@app.route('/sbgcm/{accountNumber}/{cardId}', methods=['GET'],cors=True)
 def sb_gc_meta_acc_card(accountNumber,cardId):
     return get_sb_gautrain_cards_meta().get_item(accountNumber,cardId)
 
 
-@app.route('/sbgcm/delete/{accountNumber}/{cardId}', methods=['DELETE'])
+@app.route('/sbgcm/delete/{accountNumber}/{cardId}', methods=['DELETE'],cors=True)
 def delete_sb_gc_meta_acc_card(accountNumber,cardId):
     return get_sb_gautrain_cards_meta().delete_item(accountNumber,cardId)
 
 
-@app.route('/sbgcm/{accountNumber}/{cardId}', methods=['PUT'])
+@app.route('/sbgcm/{accountNumber}/{cardId}', methods=['PUT'],cors=True)
 def update_sb_gc_meta_acc_card(accountNumber,cardId):
     body = app.current_request.json_body
     get_sb_gautrain_cards_meta().update_item(
@@ -225,7 +225,7 @@ def update_sb_gc_meta_acc_card(accountNumber,cardId):
         mobile = body['mobile']
         )
 
-@app.route('/sbgcm', methods=['GET'])
+@app.route('/sbgcm', methods=['GET'],cors=True)
 def get_sb_gautrain_cards_meta_list():
     return get_sb_gautrain_cards_meta().list_all_items()
 
@@ -234,19 +234,19 @@ geoLocations = json.dumps([
          {"rosebank":{"latitude":"11.0","longitude":"22.0"} }
         ])
 
-@app.route('/gsgl', methods=['GET'])
+@app.route('/gsgl', methods=['GET'],cors=True)
 def get_gs_geoLocation():
     #return geoLocations
     data = get_sb_gautrain_stations_data().list_all_items()[0]
     return (data['stations'])
 
-@app.route('/gsgl/list', methods=['GET'])
+@app.route('/gsgl/list', methods=['GET'],cors=True)
 def get_gs_geoLocation():
     #return geoLocations
     data = get_sb_gautrain_stations_data().list_all_items()
     return (data)
 
-@app.route('/gsgl', methods=['POST'])
+@app.route('/gsgl', methods=['POST'],cors=True)
 def add_gs_geoLocation():
     body = app.current_request.json_body
     return get_sb_gautrain_stations_data().add_item(
@@ -255,11 +255,11 @@ def add_gs_geoLocation():
 
     )
 
-@app.route('/gsgl', methods=['DELETE'])
+@app.route('/gsgl', methods=['DELETE'],cors=True)
 def delete_gs_geoLocation():
     return get_sb_gautrain_stations_data().delete_item()
 
-@app.route('/gsgl/update', methods=['PUT'])
+@app.route('/gsgl/update', methods=['PUT'],cors=True)
 def update_gs_geoLocation():
     body = app.current_request.json_body
     return get_sb_gautrain_stations_data().update_item(
