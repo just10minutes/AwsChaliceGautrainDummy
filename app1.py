@@ -266,18 +266,6 @@ def update_gs_geoLocation():
             stations = body)
 
 
-#This combines two tables data gcd and sbgcm
-@app.route('/sbgcmall/{accountNumber}', methods=['GET'],cors=True)
-def sb_gc_meta_acc_card_all(accountNumber):
-    sbgcmget = get_sb_gautrain_cards_meta().list_items(accountNumber)
-    sbgcmall = []
-    for crd in sbgcmget:
-        extraData =  get_gautrain_cards_details().get_item(crd['cardId'])
-        newData = {**crd, **extraData}
-        sbgcmall.append(newData)
-    return sbgcmall
-
-
 @app.route('/test-ddb')
 def test_ddb():
     resource = boto3.resource('dynamodb')
@@ -287,8 +275,6 @@ def test_ddb():
     sbGCMeta = resource.Table(os.environ['SB_GAUTRAIN_CARDS_META'])
     gautrainStations = resource.Table(os.environ['GAUTRAIN_STATIONS'])
     return (gautrainCards.name, sbAcntDtls.name, sbTransactions.name,sbGCMeta.name,gautrainStations.name )
-
-
 
 
 

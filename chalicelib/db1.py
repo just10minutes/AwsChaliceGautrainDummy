@@ -182,13 +182,7 @@ class DynamoSBTransactions(TableFunctions):
                 'accountNumber' : accountNumber,
                 'topupType' : topupType,
                 'topupAmount': int(topupAmount),
-                'topup_time' : time_now_utc,
-                'reference' : reference,
-                'lbAlert': lbAlert,
-                'geoAlert': geoAlert,
-                'lbLimit':int(lbLimit),
-                'email':email,
-                'mobile': mobile,
+                'topup_time' : time_now_utc
             }
         )
         #run few more updates
@@ -204,8 +198,7 @@ class DynamoSBTransactions(TableFunctions):
             DynamoGautrainCardDetails(boto3.resource('dynamodb').Table(
                 os.environ['GAUTRAIN_CARDS'])).update_balance(cardId, balance)
 
-
-        return {'reference' : reference}
+        return str(accountNumber) + str(topupItemId)
 
     def get_item(self, uid):
         response = self._table.get_item(
